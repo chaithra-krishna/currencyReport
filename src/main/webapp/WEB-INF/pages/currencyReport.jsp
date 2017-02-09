@@ -25,16 +25,40 @@
    height: 10px;
  
 }
+.span3 {  
+    height: 85% !important;
+    overflow: scroll;
+}
+tr {
+width: 100%;
+display: inline-table;
+table-layout: fixed;
+}
 
+table{
+ height:300px;              // <-- Select the height of the table
+ display: -moz-groupbox;    // Firefox Bad Effect
+ overflow: scroll;
+}
+tbody{
+  overflow-y: scroll;      
+  height: 200px;            //  <-- Select the height of the body
+  width: 100%;
+  position: absolute;
+}
 
     </style>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.css">
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.2/sockjs.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-json/2.6.0/jquery.json.min.js" type="text/javascript"></script>
-     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js" type="text/javascript"></script>
+
     <script>
 //alert("before start");
          console.log("starting..");
@@ -78,14 +102,12 @@ smoothie.addTimeSeries(line1,{ strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rg
             stompClient.subscribe('/topic/greetings', function (greeting) {
                 
                 var content = greeting.body
+                console.log(content);
                 
-                $("#recFromServer").append("<p>" + content+"</p><div id='width100PercentTest'>");
-
                 console.log("********************");
                 console.log(JSON.parse(greeting.body).rate);
                 rate = JSON.parse(greeting.body).rate;
-
-
+				reload(JSON.parse(greeting.body));
             });
         }, function (error) {
             //Connection error callback function
@@ -100,13 +122,45 @@ smoothie.addTimeSeries(line1,{ strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rg
             console.log("in send message func");
             stompClient.send("/app/greeting", {}, JSON.stringify({ 'name': $("#message").val() }));
         }
+		
+            function reload(data1){
+			var table = document.getElementById("table");
+    var row = table.insertRow(1);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+	var cell3 = row.insertCell(2);
+	var cell4 = row.insertCell(3);
+	var cell5 = row.insertCell(4);
+	var cell6 = row.insertCell(5);
+    cell1.innerHTML = data1.userId;
+    cell2.innerHTML =  data1.currencyFrom;
+	cell3.innerHTML =  data1.currencyTo;
+	cell4.innerHTML =  data1.amountSell;
+	cell5.innerHTML =  data1.amountBuy;
+	cell6.innerHTML =  data1.rate;
+            }
     </script>
 </head>
 <body>
 <h1>Welcome to currency report</h1>
+<div class="row">
+  <div class="col-sm-6"><canvas id="mycanvas" width="650" height="500"></canvas></div>
+  <div class="col-sm-6"><div  class="span3"><table class="table" id="table">
+            <thead>
+                <tr>
+                    <th >UserId</th>
+                    <th >Currency From</th>
+                    <th >Currency To</th>
+					<th >Amount Sell</th>
+					<th >Amount Buy</th>
+					<th >Rate</th>
+                </tr>
+            </thead>
+        </table></div></div>
+</div>
 <div id="container">
-    <canvas id="mycanvas" width="650" height="500"></canvas>
-<div id="recFromServer"></div>
+    
+
 
 </div>
 </body>
